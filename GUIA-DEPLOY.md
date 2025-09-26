@@ -138,6 +138,13 @@ Para notificações de deploy:
 
 ## 🚨 Troubleshooting
 
+### Problema: Exportação de PDF não funciona
+**Solução**: 
+1. O Puppeteer foi configurado especificamente para Vercel
+2. A função de geração de PDF tem timeout de 60 segundos e 1GB de memória
+3. Se ainda não funcionar, verifique os logs da Vercel para erros específicos
+4. O sistema usa configuração centralizada em `lib/puppeteer-config.ts`
+
 ### Problema: "Environment Variable references Secret which does not exist"
 **Solução**: 
 1. Remova as referências a secrets do `vercel.json`

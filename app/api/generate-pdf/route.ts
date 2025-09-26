@@ -34,8 +34,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { tipo, dados, consolidated } = body;
 
+    console.log('📊 PDF Request:', { tipo, dados: dados?.tipoServico, consolidated });
+
     // Validação básica
     if (!tipo || !dados) {
+      console.error('❌ Validação falhou:', { tipo, dados: !!dados });
       return NextResponse.json({ error: 'Tipo e dados são obrigatórios' }, { status: 400 });
     }
 
@@ -48,6 +51,7 @@ export async function POST(request: NextRequest) {
 
     switch (tipo) {
       case 'mutirao':
+        console.log('🔄 Processando mutirão...');
         // Relatório de mutirão (SELIMP)
         pdfBuffer = await exportMutiraoPdf(dados as MutiraoRelatorio);
         fileName = consolidated 
@@ -56,24 +60,28 @@ export async function POST(request: NextRequest) {
         break;
 
       case 'registro':
+        console.log('🔄 Processando registro...');
         // Registros fotográficos (Acumulador, Desfazimento, etc.)
         pdfBuffer = await exportRegistroPdf(dados as RegistroRelatorio);
         fileName = generateFileName(dados as RegistroRelatorio);
         break;
 
       case 'evidencias':
+        console.log('🔄 Processando evidências...', dados.tipoServico);
         // Evidências fotográficas gerais
         pdfBuffer = await exportEvidenciasPdf(dados as Relatorio);
         fileName = generateFileName(dados as Relatorio);
         break;
 
       case 'unified':
+        console.log('🔄 Processando unificado...');
         // Relatórios unificados (Revitalização, etc.)
         pdfBuffer = await exportUnifiedPdf(dados as Relatorio);
         fileName = generateFileName(dados as Relatorio);
         break;
 
       case 'monumentos':
+        console.log('🔄 Processando monumentos...');
         // Relatórios de Monumentos
         const html = generateMonumentosHTML(dados as MonumentosRelatorio);
         pdfBuffer = await generatePDFFromHTML(html);
@@ -81,6 +89,7 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
+        console.error('❌ Tipo inválido:', tipo);
         return NextResponse.json({ error: 'Tipo de relatório inválido' }, { status: 400 });
     }
 
@@ -99,8 +108,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Erro ao gerar PDF:', error);
+    console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
-      { error: 'Erro interno do servidor ao gerar PDF' },
+      { error: 'Erro interno do servidor ao gerar PDF', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
