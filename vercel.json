@@ -4,6 +4,10 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "functions": {
+    "app/api/generate-pdf/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
     "app/api/**/*.ts": {
       "maxDuration": 30
     }

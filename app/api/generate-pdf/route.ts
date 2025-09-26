@@ -23,6 +23,9 @@ import { generateMonumentosHTML } from '@/lib/pdf/monumentos-modern';
 // Importações para geração de nomes de arquivos
 import { generateFileName, generateConsolidatedFileName } from '@/lib/filename-generator';
 
+// Configuração centralizada do Puppeteer
+import { generatePDFFromHTML } from '@/lib/puppeteer-config';
+
 // Tipos TypeScript
 import type { MutiraoRelatorio, RegistroRelatorio, ReportSummary, Relatorio, MonumentosRelatorio } from '@/lib/types';
 
@@ -100,42 +103,5 @@ export async function POST(request: NextRequest) {
       { error: 'Erro interno do servidor ao gerar PDF' },
       { status: 500 }
     );
-  }
-}
-
-/**
- * Função auxiliar para gerar PDF a partir de HTML
- */
-async function generatePDFFromHTML(html: string): Promise<Buffer> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
-  
-  try {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1123, height: 794 }); // A4 landscape em pixels
-    
-    // Carregar HTML na página
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    
-    // Aguardar um pouco mais para garantir que as imagens carreguem
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      landscape: true,
-      printBackground: true,
-      margin: {
-        top: '0mm',
-        right: '0mm',
-        bottom: '0mm',
-        left: '0mm'
-      }
-    });
-    
-    return Buffer.from(pdfBuffer);
-  } finally {
-    await browser.close();
   }
 }

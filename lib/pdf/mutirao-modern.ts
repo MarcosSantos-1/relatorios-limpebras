@@ -26,6 +26,7 @@
  */
 
 import puppeteer from 'puppeteer';
+import { getPuppeteerConfig } from '@/lib/puppeteer-config';
 import type { MutiraoRelatorio, RegistroRelatorio, RevitalizacaoRelatorio, Relatorio } from "@/lib/types";
 import { SUB_REGIOES } from "@/lib/types";
 import { formatDateForCover, formatDateForPhotos, formatPeriodForServicePage } from "@/lib/utils";
@@ -1062,10 +1063,7 @@ export function generateMutiraoHTML(rel: MutiraoRelatorio): string {
 
 // Função principal para gerar PDF do mutirão usando Puppeteer
 export async function exportMutiraoPdf(rel: MutiraoRelatorio): Promise<Uint8Array> {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+  const browser = await puppeteer.launch(getPuppeteerConfig());
 
     try {
         const page = await browser.newPage();
@@ -1435,10 +1433,7 @@ export function generateRegistroHTML(rel: RegistroRelatorio): string {
 
 // Função para gerar PDF de registro usando Puppeteer
 export async function exportRegistroPdf(rel: RegistroRelatorio): Promise<Uint8Array> {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+  const browser = await puppeteer.launch(getPuppeteerConfig());
 
     try {
         const page = await browser.newPage();
@@ -2892,10 +2887,7 @@ export function generateEvidenciasMutiroesHTML(mutiroes: MutiraoRelatorio[], dat
 
 // Função para gerar PDF de evidências de mutirões
 export async function exportEvidenciasMutiroesPdf(mutiroes: MutiraoRelatorio[], data: string): Promise<Uint8Array> {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+  const browser = await puppeteer.launch(getPuppeteerConfig());
 
     try {
         const page = await browser.newPage();

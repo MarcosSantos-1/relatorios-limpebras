@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { getPuppeteerConfig } from '@/lib/puppeteer-config';
 import type { MutiraoRelatorio, RegistroRelatorio, RevitalizacaoRelatorio, Relatorio } from '@/lib/types';
 import { SUB_REGIOES, TIPOS_SERVICO, TITULOS_RELATORIOS } from '@/lib/types';
 import { getImageUrls } from './image-loader';
@@ -724,10 +725,7 @@ function generateUnifiedHTML(rel: Relatorio): string {
 
 // Função principal para exportar qualquer tipo de relatório
 export async function exportUnifiedPdf(rel: Relatorio): Promise<Uint8Array> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
+  const browser = await puppeteer.launch(getPuppeteerConfig());
   
   try {
     const page = await browser.newPage();
@@ -1271,10 +1269,7 @@ export function generateRevitalizacoesConsolidadoHTML(revitalizacoes: Revitaliza
 
 // Função para gerar PDF consolidado de revitalizações
 export async function exportRevitalizacoesConsolidadoPdf(revitalizacoes: RevitalizacaoRelatorio[], mesAno: string): Promise<Uint8Array> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
+  const browser = await puppeteer.launch(getPuppeteerConfig());
 
   try {
     const page = await browser.newPage();

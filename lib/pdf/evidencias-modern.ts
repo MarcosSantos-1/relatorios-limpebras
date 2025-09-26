@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { getPuppeteerConfig } from '@/lib/puppeteer-config';
 import type { Relatorio, RegistroRelatorio, RevitalizacaoRelatorio } from '@/lib/types';
 import { SUB_REGIOES, TIPOS_SERVICO, TITULOS_RELATORIOS } from '@/lib/types';
 import { getImageUrls } from './image-loader';
@@ -685,10 +686,7 @@ function generateEvidenciasHTML(rel: Relatorio): string {
 
 // Função principal para exportar PDF de evidências
 export async function exportEvidenciasPdf(rel: Relatorio): Promise<Uint8Array> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
+  const browser = await puppeteer.launch(getPuppeteerConfig());
   
   try {
     const page = await browser.newPage();
