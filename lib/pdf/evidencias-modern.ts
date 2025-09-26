@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import { getPuppeteerConfig } from '@/lib/puppeteer-config';
 import type { Relatorio, RegistroRelatorio, RevitalizacaoRelatorio } from '@/lib/types';
 import { SUB_REGIOES, TIPOS_SERVICO, TITULOS_RELATORIOS } from '@/lib/types';

@@ -25,7 +25,7 @@
  * - Classes principais: .page, .cover-page, .subregion-page, .service-photo-page
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import { getPuppeteerConfig } from '@/lib/puppeteer-config';
 import type { MutiraoRelatorio, RegistroRelatorio, RevitalizacaoRelatorio, Relatorio } from "@/lib/types";
 import { SUB_REGIOES } from "@/lib/types";
