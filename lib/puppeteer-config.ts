@@ -5,24 +5,49 @@
  * corretamente em ambientes serverless como a Vercel.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium-min';
 
-export function getPuppeteerConfig() {
-  return {
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--single-process',
-      '--disable-gpu',
-      '--disable-web-security',
-      '--disable-features=VizDisplayCompositor'
-    ]
-  };
+export async function getPuppeteerConfig() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  if (isProduction) {
+    // Configuração para Vercel/Produção
+    return {
+      headless: true,
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
+      ],
+      executablePath: await chromium.executablePath(),
+    };
+  } else {
+    // Configuração para desenvolvimento local
+    return {
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
+      ]
+    };
+  }
 }
 
 /**
@@ -30,7 +55,8 @@ export function getPuppeteerConfig() {
  * Configurada especificamente para Vercel
  */
 export async function generatePDFFromHTML(html: string): Promise<Buffer> {
-  const browser = await puppeteer.launch(getPuppeteerConfig());
+  const config = await getPuppeteerConfig();
+  const browser = await puppeteer.launch(config);
   
   try {
     const page = await browser.newPage();

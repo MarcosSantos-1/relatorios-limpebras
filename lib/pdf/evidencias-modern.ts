@@ -688,7 +688,8 @@ function generateEvidenciasHTML(rel: Relatorio): string {
 export async function exportEvidenciasPdf(rel: Relatorio): Promise<Uint8Array> {
   console.log('🔄 Iniciando exportEvidenciasPdf para:', rel.tipoServico);
   
-  const browser = await puppeteer.launch(getPuppeteerConfig());
+  const config = await getPuppeteerConfig();
+  const browser = await puppeteer.launch(config);
   
   try {
     const page = await browser.newPage();
