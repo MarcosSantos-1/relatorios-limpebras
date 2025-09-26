@@ -686,18 +686,38 @@ function generateEvidenciasHTML(rel: Relatorio): string {
 
 // Função principal para exportar PDF de evidências
 export async function exportEvidenciasPdf(rel: Relatorio): Promise<Uint8Array> {
+  console.log('🔄 Iniciando exportEvidenciasPdf para:', rel.tipoServico);
+  
   const browser = await puppeteer.launch(getPuppeteerConfig());
   
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: 1123, height: 794 }); // A4 landscape em pixels
     
+    // Configurar timeout para imagens
+    await page.setDefaultTimeout(30000);
+    
     const html = generateEvidenciasHTML(rel);
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    console.log('📄 HTML gerado, tamanho:', html.length);
     
-    // Aguardar um pouco mais para garantir que as imagens carregaram
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await page.setContent(html, { waitUntil: 'domcontentloaded' });
+    console.log('📄 Conteúdo carregado');
     
+    // Aguardar carregamento de imagens de forma mais robusta
+    try {
+      await page.waitForFunction(() => {
+        const images = document.querySelectorAll('img');
+        return Array.from(images).every(img => img.complete);
+      }, { timeout: 10000 });
+      console.log('✅ Todas as imagens carregadas');
+    } catch (imgError) {
+      console.warn('⚠️ Timeout no carregamento de imagens, continuando...');
+    }
+    
+    // Aguardar um pouco mais para garantir estabilidade
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    console.log('🔄 Gerando PDF...');
     const pdfBuffer = await page.pdf({
       format: 'A4',
       landscape: true,
@@ -710,8 +730,13 @@ export async function exportEvidenciasPdf(rel: Relatorio): Promise<Uint8Array> {
       }
     });
     
+    console.log('✅ PDF gerado com sucesso, tamanho:', pdfBuffer.length);
     return new Uint8Array(pdfBuffer);
+  } catch (error) {
+    console.error('❌ Erro na exportEvidenciasPdf:', error);
+    throw error;
   } finally {
     await browser.close();
+    console.log('🔒 Browser fechado');
   }
 }
