@@ -11,25 +11,50 @@ import chromium from '@sparticuz/chromium-min';
 export async function getPuppeteerConfig() {
   const isProduction = process.env.NODE_ENV === 'production';
   
+  console.log('🔧 Configurando Puppeteer:', { isProduction, nodeEnv: process.env.NODE_ENV });
+  
   if (isProduction) {
     // Configuração para Vercel/Produção
-    return {
-      headless: true,
-      args: [
-        ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor'
-      ],
-      executablePath: await chromium.executablePath(),
-    };
+    try {
+      const executablePath = await chromium.executablePath();
+      console.log('✅ Chromium path obtido:', executablePath);
+      
+      return {
+        headless: true,
+        args: [
+          ...chromium.args,
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor'
+        ],
+        executablePath,
+      };
+    } catch (error) {
+      console.error('❌ Erro ao obter chromium path:', error);
+      // Fallback para desenvolvimento mesmo em produção
+      return {
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor'
+        ]
+      };
+    }
   } else {
     // Configuração para desenvolvimento local
     return {
