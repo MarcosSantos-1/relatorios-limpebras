@@ -1,4 +1,3 @@
-import puppeteer from 'puppeteer-core';
 import { getPuppeteerConfig } from '@/lib/puppeteer-config';
 import type { Relatorio, RegistroRelatorio, RevitalizacaoRelatorio } from '@/lib/types';
 import { SUB_REGIOES, TIPOS_SERVICO, TITULOS_RELATORIOS } from '@/lib/types';
@@ -688,8 +687,8 @@ function generateEvidenciasHTML(rel: Relatorio): string {
 export async function exportEvidenciasPdf(rel: Relatorio): Promise<Uint8Array> {
   console.log('🔄 Iniciando exportEvidenciasPdf para:', rel.tipoServico);
   
-  const config = await getPuppeteerConfig();
-  const browser = await puppeteer.launch(config);
+  const { puppeteer, launchOptions } = await getPuppeteerConfig();
+  const browser = await puppeteer.launch(launchOptions);
   
   try {
     const page = await browser.newPage();

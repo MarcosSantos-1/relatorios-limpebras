@@ -1,78 +1,37 @@
 /**
  * Configuração centralizada do Puppeteer para Vercel
- * 
- * Esta função centraliza a configuração do Puppeteer para funcionar
- * corretamente em ambientes serverless como a Vercel.
+ * Baseada no guia oficial: https://vercel.com/guides/deploying-puppeteer-with-nextjs-on-vercel
  */
 
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium-min';
-
 export async function getPuppeteerConfig() {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isVercel = !!process.env.VERCEL_ENV;
   
-  console.log('🔧 Configurando Puppeteer:', { isProduction, nodeEnv: process.env.NODE_ENV });
+  console.log('🔧 Configurando Puppeteer:', { isVercel, vercelEnv: process.env.VERCEL_ENV });
   
-  if (isProduction) {
+  let puppeteer: any;
+  let launchOptions: any = {
+    headless: true,
+  };
+
+  if (isVercel) {
     // Configuração para Vercel/Produção
-    try {
-      const executablePath = await chromium.executablePath();
-      console.log('✅ Chromium path obtido:', executablePath);
-      
-      return {
-        headless: true,
-        args: [
-          ...chromium.args,
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--single-process',
-          '--disable-gpu',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor'
-        ],
-        executablePath,
-      };
-    } catch (error) {
-      console.error('❌ Erro ao obter chromium path:', error);
-      // Fallback para desenvolvimento mesmo em produção
-      return {
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--single-process',
-          '--disable-gpu',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor'
-        ]
-      };
-    }
+    const chromium = (await import("@sparticuz/chromium-min")).default;
+    puppeteer = await import("puppeteer-core");
+    
+    launchOptions = {
+      ...launchOptions,
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+    };
+    
+    console.log('✅ Configuração Vercel aplicada');
   } else {
     // Configuração para desenvolvimento local
-    return {
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor'
-      ]
-    };
+    puppeteer = await import("puppeteer");
+    console.log('✅ Configuração local aplicada');
   }
+
+  return { puppeteer, launchOptions };
 }
 
 /**
@@ -80,8 +39,8 @@ export async function getPuppeteerConfig() {
  * Configurada especificamente para Vercel
  */
 export async function generatePDFFromHTML(html: string): Promise<Buffer> {
-  const config = await getPuppeteerConfig();
-  const browser = await puppeteer.launch(config);
+  const { puppeteer, launchOptions } = await getPuppeteerConfig();
+  const browser = await puppeteer.launch(launchOptions);
   
   try {
     const page = await browser.newPage();

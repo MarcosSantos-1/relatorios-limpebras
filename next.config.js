@@ -3,6 +3,9 @@ const nextConfig = {
   // Configurações para deploy na Vercel
   output: 'standalone',
   
+  // The `serverExternalPackages` option allows you to opt-out of bundling dependencies in your Server Components.
+  serverExternalPackages: ["@sparticuz/chromium-min", "puppeteer-core"],
+  
   // Otimizações de performance
   compress: true,
   

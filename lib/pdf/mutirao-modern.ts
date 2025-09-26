@@ -25,7 +25,6 @@
  * - Classes principais: .page, .cover-page, .subregion-page, .service-photo-page
  */
 
-import puppeteer from 'puppeteer-core';
 import { getPuppeteerConfig } from '@/lib/puppeteer-config';
 import type { MutiraoRelatorio, RegistroRelatorio, RevitalizacaoRelatorio, Relatorio } from "@/lib/types";
 import { SUB_REGIOES } from "@/lib/types";
@@ -1063,8 +1062,8 @@ export function generateMutiraoHTML(rel: MutiraoRelatorio): string {
 
 // Função principal para gerar PDF do mutirão usando Puppeteer
 export async function exportMutiraoPdf(rel: MutiraoRelatorio): Promise<Uint8Array> {
-  const config = await getPuppeteerConfig();
-  const browser = await puppeteer.launch(config);
+  const { puppeteer, launchOptions } = await getPuppeteerConfig();
+  const browser = await puppeteer.launch(launchOptions);
 
     try {
         const page = await browser.newPage();
@@ -1434,8 +1433,8 @@ export function generateRegistroHTML(rel: RegistroRelatorio): string {
 
 // Função para gerar PDF de registro usando Puppeteer
 export async function exportRegistroPdf(rel: RegistroRelatorio): Promise<Uint8Array> {
-  const config = await getPuppeteerConfig();
-  const browser = await puppeteer.launch(config);
+  const { puppeteer, launchOptions } = await getPuppeteerConfig();
+  const browser = await puppeteer.launch(launchOptions);
 
     try {
         const page = await browser.newPage();
@@ -2889,8 +2888,8 @@ export function generateEvidenciasMutiroesHTML(mutiroes: MutiraoRelatorio[], dat
 
 // Função para gerar PDF de evidências de mutirões
 export async function exportEvidenciasMutiroesPdf(mutiroes: MutiraoRelatorio[], data: string): Promise<Uint8Array> {
-  const config = await getPuppeteerConfig();
-  const browser = await puppeteer.launch(config);
+  const { puppeteer, launchOptions } = await getPuppeteerConfig();
+  const browser = await puppeteer.launch(launchOptions);
 
     try {
         const page = await browser.newPage();

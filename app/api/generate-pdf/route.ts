@@ -12,7 +12,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer-core';
 
 // Importações dos geradores de PDF específicos
 import { exportMutiraoPdf, exportRegistroPdf } from '@/lib/pdf/mutirao-modern';
