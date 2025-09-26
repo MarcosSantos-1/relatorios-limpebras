@@ -71,23 +71,23 @@ export default function HomePage() {
     setShowForm(true);
   };
 
-  const handleSave = async (data: Acumulador | Evento | Documento) => {
+  const handleSave = async (data: any) => {
     try {
       if (editingItem) {
         if (activeTab === 'acumuladores') {
-          await updateAcumulador(editingItem.id, data);
+          await updateAcumulador(editingItem.id, data as Acumulador);
         } else if (activeTab === 'eventos') {
-          await updateEvento(editingItem.id, data);
+          await updateEvento(editingItem.id, data as Evento);
         } else if (activeTab === 'documentos') {
-          await updateSupabaseDocumento(editingItem.id, data);
+          await updateSupabaseDocumento(editingItem.id, data as Documento);
         }
       } else {
         if (activeTab === 'acumuladores') {
-          await addAcumulador(data);
+          await addAcumulador(data as Acumulador);
         } else if (activeTab === 'eventos') {
-          await addEvento(data);
+          await addEvento(data as Evento);
         } else if (activeTab === 'documentos') {
-          await addSupabaseDocumento(data);
+          await addSupabaseDocumento(data as Documento);
         }
       }
       setShowForm(false);
@@ -141,7 +141,7 @@ export default function HomePage() {
 
   const filteredItems = () => {
     if (activeTab === 'documentos') {
-      return documentos; // Documentos não dependem de data
+      return supabaseDocumentos; // Documentos não dependem de data
     }
     
     if (!selectedDate) return [];

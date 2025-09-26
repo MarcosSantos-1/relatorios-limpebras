@@ -368,12 +368,12 @@ export function useDocumentos() {
       
       console.log('=== HOOK addDocumento CONCLUÍDO ===');
       return docRef.id;
-    } catch (error) {
+    } catch (error: any) {
       console.error('=== ERRO NO HOOK addDocumento ===');
-      console.error('Tipo:', error.constructor.name);
-      console.error('Código:', error.code);
-      console.error('Mensagem:', error.message);
-      console.error('Stack:', error.stack);
+      console.error('Tipo:', error?.constructor?.name);
+      console.error('Código:', error?.code);
+      console.error('Mensagem:', error?.message);
+      console.error('Stack:', error?.stack);
       throw error;
     }
   };

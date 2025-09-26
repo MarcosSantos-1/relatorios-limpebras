@@ -9,7 +9,7 @@ export function generateFileName(relatorio: Relatorio): string {
   
   if (relatorio.tipoServico === 'MUTIRAO' && 'data' in relatorio) {
     reportDate = new Date(relatorio.data + 'T00:00:00'); // Evita problema de timezone
-  } else if (relatorio.tipoServico === 'ACUMULADOR' || relatorio.tipoServico === 'DESFAZIMENTO' || 
+  } else if (relatorio.tipoServico === 'ACUMULADOR' || 
              relatorio.tipoServico === 'ALAGAMENTOS' || relatorio.tipoServico === 'ZELADORIA') {
     reportDate = new Date((relatorio as { dataInicio: string }).dataInicio + 'T00:00:00'); // Evita problema de timezone
   } else if (relatorio.tipoServico === 'REVITALIZACAO' && 'data' in relatorio) {
@@ -38,7 +38,6 @@ export function generateFileName(relatorio: Relatorio): string {
       }
       return `Relatório Ação de Acumulador - ${dateStr} - Limpebras`;
       
-    case 'DESFAZIMENTO':
     case 'ZELADORIA':
     case 'REVITALIZACAO':
     case 'MONUMENTOS':

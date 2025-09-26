@@ -12,7 +12,7 @@ interface DocumentoFormSupabaseProps {
 
 export default function DocumentoFormSupabase({ documento, onSubmit, onCancel }: DocumentoFormSupabaseProps) {
   const [nome, setNome] = useState(documento?.nome || '');
-  const [tipo, setTipo] = useState<'PDF' | 'EXCEL'>(documento?.tipo || 'PDF');
+  const [tipo, setTipo] = useState<'PDF' | 'EXCEL' | 'IMAGEM'>(documento?.tipo || 'PDF');
   const [descricao, setDescricao] = useState(documento?.descricao || '');
   const [tags, setTags] = useState(documento?.tags?.join(', ') || '');
   const [file, setFile] = useState<File | null>(null);

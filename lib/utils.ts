@@ -124,7 +124,7 @@ export function formatPeriodForServicePage(relatorio: Relatorio): string {
     return formatDateForCover(relatorio.data);
   } else if ('dataInicio' in relatorio && 'dataTermino' in relatorio) {
     // Para outros serviços com período
-    const inicioFormatado = formatDateForPhotos(relatorio.dataInicio);
+    const inicioFormatado = formatDateForPhotos(relatorio.dataInicio || '');
     
     if (!relatorio.dataTermino || relatorio.dataInicio === relatorio.dataTermino) {
       return `Data: ${inicioFormatado}`;
