@@ -1,0 +1,215 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin-when-cross-origin"
+        }
+      ],
+      "regex": "^(?:/(.*))(?:/)?$"
+    }
+  ],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/relatorios/[id]",
+      "regex": "^/relatorios/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/relatorios/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/relatorios/[id]/editar",
+      "regex": "^/relatorios/([^/]+?)/editar(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/relatorios/(?<nxtPid>[^/]+?)/editar(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/cadastro-usuarios",
+      "regex": "^/cadastro\\-usuarios(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/cadastro\\-usuarios(?:/)?$"
+    },
+    {
+      "page": "/cadastros/eventos",
+      "regex": "^/cadastros/eventos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/cadastros/eventos(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/relatorios",
+      "regex": "^/relatorios(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios(?:/)?$"
+    },
+    {
+      "page": "/relatorios/evidencias",
+      "regex": "^/relatorios/evidencias(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/evidencias(?:/)?$"
+    },
+    {
+      "page": "/relatorios/evidencias-registros",
+      "regex": "^/relatorios/evidencias\\-registros(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/evidencias\\-registros(?:/)?$"
+    },
+    {
+      "page": "/relatorios/evidencias-revitalizacoes",
+      "regex": "^/relatorios/evidencias\\-revitalizacoes(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/evidencias\\-revitalizacoes(?:/)?$"
+    },
+    {
+      "page": "/relatorios/evidencias-rotineiros",
+      "regex": "^/relatorios/evidencias\\-rotineiros(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/evidencias\\-rotineiros(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo",
+      "regex": "^/relatorios/novo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-dds",
+      "regex": "^/relatorios/novo\\-dds(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-dds(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-ecopontos",
+      "regex": "^/relatorios/novo\\-ecopontos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-ecopontos(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-eventos",
+      "regex": "^/relatorios/novo\\-eventos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-eventos(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-feiras",
+      "regex": "^/relatorios/novo\\-feiras(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-feiras(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-monumentos",
+      "regex": "^/relatorios/novo\\-monumentos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-monumentos(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-registro",
+      "regex": "^/relatorios/novo\\-registro(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-registro(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-revitalizacao",
+      "regex": "^/relatorios/novo\\-revitalizacao(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-revitalizacao(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-rotineiros",
+      "regex": "^/relatorios/novo\\-rotineiros(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-rotineiros(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-rotineiros-lote",
+      "regex": "^/relatorios/novo\\-rotineiros\\-lote(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-rotineiros\\-lote(?:/)?$"
+    },
+    {
+      "page": "/relatorios/novo-varricao-mecanizada",
+      "regex": "^/relatorios/novo\\-varricao\\-mecanizada(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/relatorios/novo\\-varricao\\-mecanizada(?:/)?$"
+    },
+    {
+      "page": "/upload",
+      "regex": "^/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/upload(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
