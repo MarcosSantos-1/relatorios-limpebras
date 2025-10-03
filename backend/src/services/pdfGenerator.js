@@ -1,39 +1,23 @@
-const puppeteer = require('puppeteer');
+const wkhtmltopdf = require('wkhtmltopdf');
 const path = require('path');
 const fs = require('fs');
 
-// Configuração do Puppeteer para diferentes ambientes
-const getPuppeteerConfig = () => {
-  const isProduction = process.env.NODE_ENV === 'production';
-  
-  if (isProduction) {
-    // Configuração para produção (Railway, Heroku, etc.)
-    return {
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor',
-        '--single-process',
-        '--no-zygote'
-      ],
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
-    };
-  } else {
-    // Configuração para desenvolvimento
-    return {
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu'
-      ]
-    };
-  }
+// Configuração do wkhtmltopdf
+const getWkhtmltopdfConfig = () => {
+  return {
+    pageSize: 'A4',
+    orientation: 'Landscape',
+    marginTop: 0,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    disableSmartShrinking: true,
+    printMediaType: true,
+    encoding: 'UTF-8',
+    imageQuality: 94,
+    imageDpi: 300,
+    enableLocalFileAccess: true
+  };
 };
 
 // URLs das imagens (ajustar conforme necessário)
@@ -661,62 +645,33 @@ const generateUnifiedHTML = (rel) => {
 const generatePDF = async (relatorio) => {
   console.log('🔄 Iniciando geração de PDF para:', relatorio.tipoServico);
   
-  const config = getPuppeteerConfig();
-  const browser = await puppeteer.launch(config);
+  const config = getWkhtmltopdfConfig();
+  const html = generateUnifiedHTML(relatorio);
+  console.log('📄 HTML gerado, tamanho:', html.length);
   
-  try {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1123, height: 794 }); // A4 landscape em pixels
+  return new Promise((resolve, reject) => {
+    const pdfStream = wkhtmltopdf(html, config);
+    const chunks = [];
     
-    // Configurar timeout para imagens
-    await page.setDefaultTimeout(30000);
-    
-    const html = generateUnifiedHTML(relatorio);
-    console.log('📄 HTML gerado, tamanho:', html.length);
-    
-    await page.setContent(html, { waitUntil: 'domcontentloaded' });
-    console.log('📄 Conteúdo carregado');
-    
-    // Aguardar carregamento de imagens
-    try {
-      await page.waitForFunction(() => {
-        const images = document.querySelectorAll('img');
-        return Array.from(images).every(img => img.complete);
-      }, { timeout: 300000 }); // 5 minutos
-      console.log('✅ Todas as imagens carregadas');
-    } catch (imgError) {
-      console.warn('⚠️ Timeout no carregamento de imagens, continuando...');
-    }
-    
-    // Aguardar estabilidade
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    console.log('🔄 Gerando PDF...');
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      landscape: true,
-      printBackground: true,
-      margin: {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0
-      }
+    pdfStream.on('data', (chunk) => {
+      chunks.push(chunk);
     });
     
-    console.log('✅ PDF gerado com sucesso, tamanho:', pdfBuffer.length);
-    return pdfBuffer;
-  } catch (error) {
-    console.error('❌ Erro na geração de PDF:', error);
-    throw error;
-  } finally {
-    await browser.close();
-    console.log('🔒 Browser fechado');
-  }
+    pdfStream.on('end', () => {
+      const pdfBuffer = Buffer.concat(chunks);
+      console.log('✅ PDF gerado com sucesso, tamanho:', pdfBuffer.length);
+      resolve(pdfBuffer);
+    });
+    
+    pdfStream.on('error', (error) => {
+      console.error('❌ Erro na geração de PDF:', error);
+      reject(error);
+    });
+  });
 };
 
 module.exports = {
   generatePDF,
-  getPuppeteerConfig,
+  getWkhtmltopdfConfig,
   getImageUrls
 };
