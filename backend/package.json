@@ -6,15 +6,12 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "build": "echo 'No build step required'",
-    "test": "jest"
+    "build": "echo 'No build step required'"
   },
   "dependencies": {
-    "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
@@ -29,9 +26,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
-    "nodemon": "^3.0.2",
-    "supertest": "^6.3.3"
+    "nodemon": "^3.0.2"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -40,7 +35,6 @@
     "relatorios",
     "prefeitura",
     "pdf",
-    "puppeteer",
     "express"
   ],
   "author": "Sistema de Relatórios",

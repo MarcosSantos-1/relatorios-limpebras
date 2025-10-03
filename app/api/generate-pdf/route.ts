@@ -1,41 +1,24 @@
 /**
- * API para Geração de PDFs - Endpoint Unificado
+ * API para Geração de PDFs - Proxy para Backend
  * 
- * Este arquivo centraliza toda a geração de PDFs da aplicação.
- * Suporta diferentes tipos de relatórios com templates específicos.
- * 
- * Tipos suportados:
- * - mutirao: Relatórios de mutirão (individual ou consolidado)
- * - registro: Registros fotográficos (acumulador, desfazimento, etc.)
- * - evidencias: Evidências fotográficas
- * - unified: Relatórios unificados (revitalização, etc.)
+ * Este arquivo redireciona a geração de PDFs para o backend.
+ * O backend é responsável por toda a lógica de geração de PDFs.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer-core';
-
-// Importações dos geradores de PDF específicos
-import { exportMutiraoPdf, exportRegistroPdf } from '@/lib/pdf/mutirao-modern';
-import { exportEvidenciasPdf, exportEventosPdf } from '@/lib/pdf/evidencias-modern';
-import { exportUnifiedPdf } from '@/lib/pdf/relatorios-modern';
-import { generateMonumentosHTML } from '@/lib/pdf/monumentos-modern';
-import { exportEvidenciasRotineirosPdf } from '@/lib/pdf/rotineiros-modern';
 
 // Importações para geração de nomes de arquivos
-import { generateFileName, generateConsolidatedFileName } from '@/lib/filename-generator';
-
-// Configuração centralizada do Puppeteer
-import { generatePDFFromHTML } from '@/lib/puppeteer-config';
+import { generateFileName } from '@/lib/filename-generator';
 
 // Tipos TypeScript
-import type { MutiraoRelatorio, RegistroRelatorio, ReportSummary, Relatorio, MonumentosRelatorio, RotineirosRelatorio } from '@/lib/types';
+import type { Relatorio } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tipo, dados, consolidated } = body;
+    const { tipo, dados } = body;
 
-    console.log('📊 PDF Request:', { tipo, dados: dados?.tipoServico, consolidated });
+    console.log('📊 PDF Request:', { tipo, dados: dados?.tipoServico });
 
     // Validação básica
     if (!tipo || !dados) {
@@ -43,88 +26,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Tipo e dados são obrigatórios' }, { status: 400 });
     }
 
-    let pdfBuffer: Buffer | Uint8Array;
-    let fileName: string;
+    // Redirecionar para o backend para geração de PDF
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/relatorios/${dados.id}/generate-pdf`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${body.token || ''}`
+      }
+    });
 
-    // ========================================
-    // ROTEAMENTO POR TIPO DE RELATÓRIO
-    // ========================================
-
-    switch (tipo) {
-      case 'mutirao':
-        console.log('🔄 Processando mutirão...');
-        // Relatório de mutirão (SELIMP)
-        pdfBuffer = await exportMutiraoPdf(dados as MutiraoRelatorio);
-        fileName = consolidated 
-          ? generateConsolidatedFileName(dados.data) // Data filtrada para consolidado
-          : generateFileName(dados as MutiraoRelatorio);
-        break;
-
-      case 'registro':
-        console.log('🔄 Processando registro...');
-        // Registros fotográficos (Acumulador, Desfazimento, etc.)
-        pdfBuffer = await exportRegistroPdf(dados as RegistroRelatorio);
-        fileName = generateFileName(dados as RegistroRelatorio);
-        break;
-
-      case 'evidencias':
-        console.log('🔄 Processando evidências...', dados.tipoServico);
-        // Evidências fotográficas gerais
-        pdfBuffer = await exportEvidenciasPdf(dados as Relatorio);
-        fileName = generateFileName(dados as Relatorio);
-        break;
-
-      case 'eventos':
-        console.log('🔄 Processando eventos...', dados.tipoServico);
-        // Relatórios de eventos com legendas especiais
-        pdfBuffer = await exportEventosPdf(dados as Relatorio);
-        fileName = generateFileName(dados as Relatorio);
-        break;
-
-      case 'unified':
-        console.log('🔄 Processando unificado...');
-        // Relatórios unificados (Revitalização, etc.)
-        pdfBuffer = await exportUnifiedPdf(dados as Relatorio);
-        fileName = generateFileName(dados as Relatorio);
-        break;
-
-      case 'monumentos':
-        console.log('🔄 Processando monumentos...');
-        // Relatórios de Monumentos
-        const html = generateMonumentosHTML(dados as MonumentosRelatorio);
-        pdfBuffer = await generatePDFFromHTML(html);
-        fileName = generateFileName(dados as MonumentosRelatorio);
-        break;
-
-      case 'rotineiros':
-        console.log('🔄 Processando serviços rotineiros...');
-        console.log('📊 Dados recebidos:', JSON.stringify(dados, null, 2));
-        // Relatórios de Serviços Rotineiros (individual)
-        const dataFormatada = new Date(dados.data).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-        console.log('📅 Data formatada:', dataFormatada);
-        console.log('📋 Array de rotineiros:', [dados as RotineirosRelatorio]);
-        pdfBuffer = await exportEvidenciasRotineirosPdf(
-          dataFormatada,
-          [dados as RotineirosRelatorio]
-        );
-        fileName = generateFileName(dados as RotineirosRelatorio);
-        console.log('📄 Nome do arquivo:', fileName);
-        break;
-
-      default:
-        console.error('❌ Tipo inválido:', tipo);
-        return NextResponse.json({ error: 'Tipo de relatório inválido' }, { status: 400 });
+    if (!response.ok) {
+      throw new Error(`Backend error: ${response.status}`);
     }
 
-    // ========================================
-    // RESPOSTA COM PDF GERADO
-    // ========================================
+    const pdfBuffer = await response.arrayBuffer();
+    const fileName = generateFileName(dados);
 
+    console.log('✅ PDF gerado com sucesso via backend');
+
+    // Retornar o PDF gerado pelo backend
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        // Usa UTF-8 encoding para suportar caracteres especiais nos nomes
         'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}.pdf`,
       },
     });

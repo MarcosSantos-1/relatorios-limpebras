@@ -1,15 +1,6 @@
 # Dockerfile otimizado para Render
 FROM node:18-alpine
 
-# Instalar wkhtmltopdf
-RUN apk add --no-cache \
-    wkhtmltopdf \
-    xvfb \
-    ttf-dejavu \
-    ttf-droid \
-    ttf-freefont \
-    ttf-liberation
-
 # Criar diretório da aplicação
 WORKDIR /app
 
