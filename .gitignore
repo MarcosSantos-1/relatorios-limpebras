@@ -85,10 +85,10 @@ typings/
 
 # Next.js build output
 .next/
+.next/**
 out/
 
 # Build files
-.next/
 build/
 dist/
 
