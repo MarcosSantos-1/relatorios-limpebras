@@ -144,14 +144,19 @@ export default function EvidenciasPage() {
 
     setExporting(true);
     try {
-      const response = await fetch('/api/export-evidencias-mutiroes', {
+      const response = await fetch('/api/generate-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          data: dataFiltro, 
-          mutiroes: mutiroesFiltrados 
+          tipo: 'evidencias',
+          dados: {
+            id: 'evidencias-mutiroes',
+            tipoServico: 'MUTIRAO',
+            data: dataFiltro,
+            mutiroes: mutiroesFiltrados
+          }
         }),
       });
 

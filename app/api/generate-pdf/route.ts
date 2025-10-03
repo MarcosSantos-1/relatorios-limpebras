@@ -26,15 +26,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Tipo e dados são obrigatórios' }, { status: 400 });
     }
 
-    // Redirecionar para o backend para geração de PDF
+    // Para evidências, gerar PDF diretamente no backend
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/relatorios/${dados.id}/generate-pdf`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${body.token || ''}`
-      }
-    });
+    
+    let response;
+    if (tipo === 'evidencias') {
+      // Gerar PDF de evidências diretamente
+      response = await fetch(`${backendUrl}/api/pdf/generate-evidencias`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${body.token || ''}`
+        },
+        body: JSON.stringify(dados)
+      });
+    } else {
+      // Para relatórios individuais, usar rota existente
+      response = await fetch(`${backendUrl}/api/relatorios/${dados.id}/generate-pdf`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${body.token || ''}`
+        }
+      });
+    }
 
     if (!response.ok) {
       throw new Error(`Backend error: ${response.status}`);

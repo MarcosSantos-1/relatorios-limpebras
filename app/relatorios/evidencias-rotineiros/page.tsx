@@ -174,14 +174,19 @@ export default function EvidenciasRotineirosPage() {
     try {
       setExportProgress("Carregando dados e gerando HTML...");
       
-      const response = await fetch('/api/export-evidencias-rotineiros', {
+      const response = await fetch('/api/generate-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          mesAno: getMesAnoFromDate(rotineirosFiltrados[0].data), 
-          rotineiros: rotineirosFiltrados 
+          tipo: 'evidencias',
+          dados: {
+            id: 'evidencias-rotineiros',
+            tipoServico: 'ROTINEIROS',
+            mesAno: getMesAnoFromDate(rotineirosFiltrados[0].data), 
+            rotineiros: rotineirosFiltrados 
+          }
         }),
       });
 

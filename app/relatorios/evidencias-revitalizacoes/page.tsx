@@ -163,14 +163,19 @@ export default function EvidenciasRevitalizacoesPage() {
 
     setExporting(true);
     try {
-      const response = await fetch('/api/export-evidencias-revitalizacoes', {
+      const response = await fetch('/api/generate-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          mesAno: getMesAnoFromDate(revitalizacoesFiltradas[0].data), 
-          revitalizacoes: revitalizacoesFiltradas 
+          tipo: 'evidencias',
+          dados: {
+            id: 'evidencias-revitalizacoes',
+            tipoServico: 'REVITALIZACAO',
+            mesAno: getMesAnoFromDate(revitalizacoesFiltradas[0].data), 
+            revitalizacoes: revitalizacoesFiltradas 
+          }
         }),
       });
 

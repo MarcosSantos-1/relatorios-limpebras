@@ -7,6 +7,72 @@ const path = require('path');
 
 const router = express.Router();
 
+// Gerar PDF de evidências (mutirões, revitalizações, rotineiros)
+router.post('/generate-evidencias', authenticateToken, async (req, res) => {
+  try {
+    const { tipoServico, data, mesAno, mutiroes, revitalizacoes, rotineiros } = req.body;
+
+    console.log('📊 Gerando PDF de evidências:', { tipoServico, data, mesAno });
+
+    let relatorioParaPDF;
+
+    if (tipoServico === 'MUTIRAO' && mutiroes) {
+      relatorioParaPDF = {
+        id: 'evidencias-mutiroes',
+        tipoServico: 'MUTIRAO',
+        data: data,
+        mutiroes: mutiroes,
+        fotos: []
+      };
+    } else if (tipoServico === 'REVITALIZACAO' && revitalizacoes) {
+      relatorioParaPDF = {
+        id: 'evidencias-revitalizacoes',
+        tipoServico: 'REVITALIZACAO',
+        mesAno: mesAno,
+        revitalizacoes: revitalizacoes,
+        fotos: []
+      };
+    } else if (tipoServico === 'ROTINEIROS' && rotineiros) {
+      relatorioParaPDF = {
+        id: 'evidencias-rotineiros',
+        tipoServico: 'ROTINEIROS',
+        mesAno: mesAno,
+        rotineiros: rotineiros,
+        fotos: []
+      };
+    } else {
+      return res.status(400).json({ error: 'Dados inválidos para geração de PDF' });
+    }
+
+    // Gerar PDF
+    const pdfBuffer = await generatePDF(relatorioParaPDF);
+
+    // Definir nome do arquivo
+    let fileName;
+    if (tipoServico === 'MUTIRAO') {
+      fileName = `evidencias-mutiroes-${data}`;
+    } else if (tipoServico === 'REVITALIZACAO') {
+      fileName = `evidencias-revitalizacoes-${mesAno}`;
+    } else if (tipoServico === 'ROTINEIROS') {
+      fileName = `evidencias-rotineiros-${mesAno}`;
+    } else {
+      fileName = `evidencias-${Date.now()}`;
+    }
+
+    // Configurar headers para download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    console.log('✅ PDF de evidências gerado com sucesso:', fileName);
+
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de evidências:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
 // Gerar PDF de relatório específico
 router.post('/generate', authenticateToken, async (req, res) => {
   try {
