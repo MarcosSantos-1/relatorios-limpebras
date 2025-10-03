@@ -1,22 +1,21 @@
-const wkhtmltopdf = require('wkhtmltopdf-installer');
+const pdf = require('html-pdf-node');
 const path = require('path');
 const fs = require('fs');
 
-// Configuração do wkhtmltopdf
-const getWkhtmltopdfConfig = () => {
+// Configuração do html-pdf-node
+const getPdfConfig = () => {
   return {
-    pageSize: 'A4',
-    orientation: 'Landscape',
-    marginTop: 0,
-    marginRight: 0,
-    marginBottom: 0,
-    marginLeft: 0,
-    disableSmartShrinking: true,
-    printMediaType: true,
-    encoding: 'UTF-8',
-    imageQuality: 94,
-    imageDpi: 300,
-    enableLocalFileAccess: true
+    format: 'A4',
+    landscape: true,
+    margin: {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    },
+    printBackground: true,
+    displayHeaderFooter: false,
+    preferCSSPageSize: true
   };
 };
 
@@ -31,10 +30,42 @@ const getImageUrls = () => ({
 
 // Função para formatar data
 const formatDateForCover = (date) => {
-  const d = new Date(date);
-  const month = d.toLocaleDateString('pt-BR', { month: 'long' });
+  if (!date) return '';
+  
+  // Se já está no formato DD/MM/YYYY, extrair partes
+  if (typeof date === 'string' && date.includes('/')) {
+    const parts = date.split('/');
+    const day = parseInt(parts[0]);
+    const month = parseInt(parts[1]);
+    const year = parseInt(parts[2]);
+    
+    const monthNames = [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+    
+    return `São Paulo, ${day} de ${monthNames[month - 1]} de ${year}`;
+  }
+  
+  // Se é uma data ISO com horário, extrair apenas a parte da data
+  let datePart = date;
+  if (typeof date === 'string' && date.includes('T')) {
+    datePart = date.split('T')[0];
+  }
+  
+  // Converter para objeto Date
+  const d = new Date(datePart + 'T00:00:00');
+  
+  const monthNames = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+  
+  const day = d.getDate();
+  const month = monthNames[d.getMonth()];
   const year = d.getFullYear();
-  return `São Paulo, ${month.charAt(0).toUpperCase() + month.slice(1)} de ${year}`;
+  
+  return `São Paulo, ${day} de ${month} de ${year}`;
 };
 
 // Função para formatar período
@@ -53,8 +84,28 @@ const formatPeriodForServicePage = (rel) => {
 
 // Função para formatar data para fotos
 const formatDateForPhotos = (date) => {
-  const d = new Date(date);
-  return d.toLocaleDateString('pt-BR');
+  if (!date) return '';
+  
+  // Se já está no formato DD/MM/YYYY, retorna como está
+  if (typeof date === 'string' && date.includes('/')) {
+    return date;
+  }
+  
+  // Se é uma data ISO com horário, extrair apenas a parte da data
+  let datePart = date;
+  if (typeof date === 'string' && date.includes('T')) {
+    datePart = date.split('T')[0];
+  }
+  
+  // Converter para objeto Date
+  const d = new Date(datePart + 'T00:00:00');
+  
+  // Formatar no padrão DD/MM/YYYY
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  
+  return `${day}/${month}/${year}`;
 };
 
 // Função para formatar período para fotos
@@ -645,33 +696,27 @@ const generateUnifiedHTML = (rel) => {
 const generatePDF = async (relatorio) => {
   console.log('🔄 Iniciando geração de PDF para:', relatorio.tipoServico);
   
-  const config = getWkhtmltopdfConfig();
+  const config = getPdfConfig();
   const html = generateUnifiedHTML(relatorio);
   console.log('📄 HTML gerado, tamanho:', html.length);
   
-  return new Promise((resolve, reject) => {
-    const pdfStream = wkhtmltopdf(html, config);
-    const chunks = [];
-    
-    pdfStream.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-    
-    pdfStream.on('end', () => {
-      const pdfBuffer = Buffer.concat(chunks);
-      console.log('✅ PDF gerado com sucesso, tamanho:', pdfBuffer.length);
-      resolve(pdfBuffer);
-    });
-    
-    pdfStream.on('error', (error) => {
-      console.error('❌ Erro na geração de PDF:', error);
-      reject(error);
-    });
-  });
+  const options = {
+    content: html,
+    ...config
+  };
+  
+  try {
+    const pdfBuffer = await pdf.generatePdf(options, { type: 'buffer' });
+    console.log('✅ PDF gerado com sucesso, tamanho:', pdfBuffer.length);
+    return pdfBuffer;
+  } catch (error) {
+    console.error('❌ Erro na geração de PDF:', error);
+    throw error;
+  }
 };
 
 module.exports = {
   generatePDF,
-  getWkhtmltopdfConfig,
+  getPdfConfig,
   getImageUrls
 };

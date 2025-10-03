@@ -67,8 +67,16 @@ router.get('/', authenticateToken, async (req, res) => {
     const total = parseInt(countResult.rows[0].total);
     const totalPages = Math.ceil(total / limit);
 
+    // Formatar datas para retornar sem fuso horário
+    const formattedRelatorios = result.rows.map(relatorio => ({
+      ...relatorio,
+      data_relatorio: relatorio.data_relatorio ? relatorio.data_relatorio.toISOString().split('T')[0] : null,
+      created_at: relatorio.created_at ? relatorio.created_at.toISOString() : null,
+      updated_at: relatorio.updated_at ? relatorio.updated_at.toISOString() : null
+    }));
+
     res.json({
-      relatorios: result.rows,
+      relatorios: formattedRelatorios,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

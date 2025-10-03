@@ -285,7 +285,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
           <div className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-4">
             <h2 className="text-lg font-semibold mb-3 text-zinc-900 dark:text-zinc-100">Quantitativo Estimado</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {(relatorio as MutiraoRelatorio).quantitativo.map((q, idx) => {
+              {((relatorio as MutiraoRelatorio).quantitativo || []).map((q, idx) => {
                 const isDecimal = q.tipo === "decimal";
                 const isHighlighted = q.descricao.includes("Colaboradores") || 
                                      q.descricao.includes("Varrição") || 
@@ -301,7 +301,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                       value={q.quantidade as string}
                       onChange={(e) => {
                         const formattedVal = formatQuantitativo(e.target.value, q.tipo || "quantidade");
-                        const newQuantitativo = [...(relatorio as MutiraoRelatorio).quantitativo];
+                        const newQuantitativo = [...((relatorio as MutiraoRelatorio).quantitativo || [])];
                         newQuantitativo[idx].quantidade = formattedVal;
                         setRelatorio({
                           ...relatorio,
@@ -311,7 +311,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                       onBlur={(e) => {
                         const formattedVal = formatQuantitativoOnBlur(e.target.value, q.tipo || "quantidade");
                         if (formattedVal !== e.target.value) {
-                          const newQuantitativo = [...(relatorio as MutiraoRelatorio).quantitativo];
+                          const newQuantitativo = [...((relatorio as MutiraoRelatorio).quantitativo || [])];
                           newQuantitativo[idx].quantidade = formattedVal;
                           setRelatorio({
                             ...relatorio,
@@ -335,7 +335,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
           </div>
 
           {/* Seções do Mutirão */}
-          {(relatorio as MutiraoRelatorio).secoes.map((secao, secaoIdx) => (
+          {((relatorio as MutiraoRelatorio).secoes || []).map((secao, secaoIdx) => (
             <div key={secaoIdx} className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-4">
               <h3 className="text-lg font-semibold mb-3 text-zinc-900 dark:text-zinc-100">Seção {secaoIdx + 1}</h3>
               
@@ -345,7 +345,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                   <select
                     value={secao.sub}
                     onChange={(e) => {
-                      const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                      const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                       newSecoes[secaoIdx].sub = e.target.value as SubRegiao;
                       setRelatorio({
                         ...relatorio,
@@ -368,7 +368,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                     type="text"
                     value={secao.local}
                     onChange={(e) => {
-                      const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                      const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                       newSecoes[secaoIdx].local = e.target.value;
                       setRelatorio({
                         ...relatorio,
@@ -385,7 +385,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                 <textarea
                   value={secao.descricao}
                   onChange={(e) => {
-                    const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                    const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                     newSecoes[secaoIdx].descricao = e.target.value;
                     setRelatorio({
                       ...relatorio,
@@ -404,7 +404,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                     <img src={secao.equipeFotoUrl} alt="Foto da equipe" className="w-32 h-32 object-cover rounded border border-zinc-300 dark:border-zinc-600" />
                     <button
                       onClick={() => {
-                        const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                        const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                         newSecoes[secaoIdx].equipeFotoUrl = "";
                         setRelatorio({
                           ...relatorio,
@@ -424,7 +424,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                     const file = e.target.files?.[0];
                     if (file) {
                       handleFileUpload(file, (url) => {
-                        const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                        const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                         newSecoes[secaoIdx].equipeFotoUrl = url;
                         setRelatorio({
                           ...relatorio,
@@ -444,7 +444,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                     <img src={secao.mapaFotoUrl} alt="Foto do mapa" className="w-32 h-32 object-cover rounded border border-zinc-300 dark:border-zinc-600" />
                     <button
                       onClick={() => {
-                        const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                        const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                         newSecoes[secaoIdx].mapaFotoUrl = "";
                         setRelatorio({
                           ...relatorio,
@@ -464,7 +464,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                     const file = e.target.files?.[0];
                     if (file) {
                       handleFileUpload(file, (url) => {
-                        const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                        const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                         newSecoes[secaoIdx].mapaFotoUrl = url;
                         setRelatorio({
                           ...relatorio,
@@ -481,13 +481,13 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
               <div className="mb-4">
                 <label className="block text-sm text-zinc-700 dark:text-zinc-300 mb-2">INFORMAÇÕES</label>
                 <div className="space-y-2">
-                  {secao.informacoes.map((info, infoIdx) => (
+                  {(secao.informacoes || []).map((info, infoIdx) => (
                     <div key={infoIdx} className="flex gap-2 items-center">
                       <input
                         type="text"
                         value={info.ordem}
                         onChange={(e) => {
-                          const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                          const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                           newSecoes[secaoIdx].informacoes[infoIdx].ordem = parseInt(e.target.value) || 0;
                           setRelatorio({
                             ...relatorio,
@@ -501,7 +501,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                         type="text"
                         value={info.descricao}
                         onChange={(e) => {
-                          const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                          const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                           newSecoes[secaoIdx].informacoes[infoIdx].descricao = e.target.value;
                           setRelatorio({
                             ...relatorio,
@@ -513,7 +513,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                       />
                       <button
                         onClick={() => {
-                          const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                          const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                           newSecoes[secaoIdx].informacoes.splice(infoIdx, 1);
                           setRelatorio({
                             ...relatorio,
@@ -528,7 +528,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                   ))}
                   <button
                     onClick={() => {
-                      const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                      const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                       newSecoes[secaoIdx].informacoes.push({
                         ordem: newSecoes[secaoIdx].informacoes.length + 1,
                         descricao: ""
@@ -550,14 +550,14 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                 <label className="block text-sm text-zinc-700 dark:text-zinc-300 mb-2">Serviços Executados</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                   {SERVICOS_MUTIRAO.map((servico) => {
-                    const isSelected = secao.servicos.some(s => s.assunto === servico);
+                    const isSelected = (secao.servicos || []).some(s => s.assunto === servico);
                     return (
                       <label key={servico} className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => {
-                            const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                            const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                             if (isSelected) {
                               // Remove o serviço
                               newSecoes[secaoIdx].servicos = newSecoes[secaoIdx].servicos.filter(s => s.assunto !== servico);
@@ -583,17 +583,17 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
               </div>
 
               {/* Serviços com Fotos */}
-              {secao.servicos.length > 0 && (
+              {(secao.servicos || []).length > 0 && (
                 <div className="mb-4">
                   <label className="block text-sm text-zinc-700 dark:text-zinc-300 mb-2">Fotos dos Serviços</label>
                   <div className="space-y-3">
-                    {secao.servicos.map((servico, servicoIdx) => (
+                    {(secao.servicos || []).map((servico, servicoIdx) => (
                       <div key={servicoIdx} className="bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded p-3">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium text-zinc-900 dark:text-zinc-200">{servico.assunto}</h4>
                           <button
                             onClick={() => {
-                              const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                              const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                               newSecoes[secaoIdx].servicos.splice(servicoIdx, 1);
                               setRelatorio({
                                 ...relatorio,
@@ -610,7 +610,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                         </div>
                       
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          {servico.fotos.map((foto, fotoIdx) => (
+                          {(servico.fotos || []).map((foto, fotoIdx) => (
                             <div key={fotoIdx} className="space-y-2">
                               <div className="relative">
                                 <img 
@@ -627,7 +627,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                                 />
                                 <button
                                   onClick={() => {
-                                    const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                                    const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                                     newSecoes[secaoIdx].servicos[servicoIdx].fotos.splice(fotoIdx, 1);
                                     setRelatorio({
                                       ...relatorio,
@@ -643,7 +643,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                                 type="text"
                                 value={foto.descricao}
                                 onChange={(e) => {
-                                  const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                                  const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                                   newSecoes[secaoIdx].servicos[servicoIdx].fotos[fotoIdx].descricao = e.target.value;
                                   setRelatorio({
                                     ...relatorio,
@@ -689,7 +689,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                                 // Usar setTimeout para garantir ordem sequencial
                                 setTimeout(() => {
                                   handleFileUpload(file, (url) => {
-                                    const newSecoes = [...(relatorio as MutiraoRelatorio).secoes];
+                                    const newSecoes = [...((relatorio as MutiraoRelatorio).secoes || [])];
                                     newSecoes[secaoIdx].servicos[servicoIdx].fotos.push({
                                       url,
                                       etapa: "Adicional" as FotoEtapa,
@@ -769,13 +769,13 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
           <div className="bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-4">
             <h2 className="text-lg font-semibold mb-3 text-zinc-900 dark:text-zinc-100">Serviços Executados</h2>
             
-            {(relatorio as RotineirosRelatorio).servicos.map((servico, servicoIdx) => (
+            {((relatorio as RotineirosRelatorio).servicos || []).map((servico, servicoIdx) => (
               <div key={servicoIdx} className="bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded p-4 mb-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-medium text-zinc-900 dark:text-zinc-200">{servico.assunto}</h3>
                   <button
                     onClick={() => {
-                      const newServicos = [...(relatorio as RotineirosRelatorio).servicos];
+                      const newServicos = [...((relatorio as RotineirosRelatorio).servicos || [])];
                       newServicos.splice(servicoIdx, 1);
                       setRelatorio({
                         ...relatorio,
@@ -788,9 +788,9 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                   </button>
                 </div>
                 
-                {servico.fotos.length > 0 && (
+                {(servico.fotos || []).length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
-                    {servico.fotos.map((foto, fotoIdx) => (
+                    {(servico.fotos || []).map((foto, fotoIdx) => (
                       <div key={fotoIdx} className="space-y-2">
                         <div className="relative">
                           <img 
@@ -800,7 +800,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                           />
                           <button
                             onClick={() => {
-                              const newServicos = [...(relatorio as RotineirosRelatorio).servicos];
+                              const newServicos = [...((relatorio as RotineirosRelatorio).servicos || [])];
                               newServicos[servicoIdx].fotos.splice(fotoIdx, 1);
                               setRelatorio({
                                 ...relatorio,
@@ -816,7 +816,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                           type="text"
                           value={foto.descricao}
                           onChange={(e) => {
-                            const newServicos = [...(relatorio as RotineirosRelatorio).servicos];
+                            const newServicos = [...((relatorio as RotineirosRelatorio).servicos || [])];
                             newServicos[servicoIdx].fotos[fotoIdx].descricao = e.target.value;
                             setRelatorio({
                               ...relatorio,
@@ -860,7 +860,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                         
                         const urls = await Promise.all(uploadPromises);
                         
-                        const newServicos = [...(relatorio as RotineirosRelatorio).servicos];
+                        const newServicos = [...((relatorio as RotineirosRelatorio).servicos || [])];
                         urls.forEach(url => {
                           newServicos[servicoIdx].fotos.push({
                             url,
@@ -888,7 +888,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                   <textarea
                     value={servico.observacao || ""}
                     onChange={(e) => {
-                      const newServicos = [...(relatorio as RotineirosRelatorio).servicos];
+                      const newServicos = [...((relatorio as RotineirosRelatorio).servicos || [])];
                       newServicos[servicoIdx].observacao = e.target.value;
                       setRelatorio({
                         ...relatorio,
@@ -907,7 +907,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
               <h3 className="text-md font-semibold mb-3 text-zinc-900 dark:text-zinc-100">Adicionar Novo Serviço</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {SERVICOS_MUTIRAO.map((servicoNome) => {
-                  const jaExiste = (relatorio as RotineirosRelatorio).servicos.some(s => s.assunto === servicoNome);
+                  const jaExiste = ((relatorio as RotineirosRelatorio).servicos || []).some(s => s.assunto === servicoNome);
                   return (
                     <button
                       key={servicoNome}
@@ -917,7 +917,7 @@ export default function EditarRelatorioPage({ params }: { params: Promise<{ id: 
                           return;
                         }
                         
-                        const newServicos = [...(relatorio as RotineirosRelatorio).servicos, {
+                        const newServicos = [...((relatorio as RotineirosRelatorio).servicos || []), {
                           assunto: servicoNome,
                           fotos: [],
                           observacao: ""
