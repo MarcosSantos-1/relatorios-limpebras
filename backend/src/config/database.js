@@ -20,7 +20,11 @@ const connectDB = async () => {
     client.release();
   } catch (err) {
     console.error('❌ Erro ao conectar ao PostgreSQL:', err.message);
-    process.exit(1);
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    } else {
+      console.log('⚠️ Continuando sem banco em desenvolvimento...');
+    }
   }
 };
 

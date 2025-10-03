@@ -1,4 +1,4 @@
-const wkhtmltopdf = require('wkhtmltopdf');
+const wkhtmltopdf = require('wkhtmltopdf-installer');
 const path = require('path');
 const fs = require('fs');
 
