@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: relatorios_postgres
+    environment:
+      POSTGRES_DB: relatorios
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - relatorios_network
+
+  # Backend Go
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: relatorios_backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      DB_NAME: relatorios
+      DB_SSLMODE: disable
+      PORT: 8080
+      GIN_MODE: release
+      TEMP_DIR: /tmp
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - /tmp:/tmp
+    networks:
+      - relatorios_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  relatorios_network:
+    driver: bridge

@@ -1,0 +1,25 @@
+# CONFIGURAÇÃO PARA DEPLOY - BACKEND
+# Copie este conteúdo para o arquivo backend/.env
+
+# Configuração do banco Neon PostgreSQL
+DB_HOST=ep-snowy-queen-acl6wrv7-pooler.sa-east-1.aws.neon.tech
+DB_PORT=5432
+DB_USER=neondb_owner
+DB_PASSWORD=npg_HTYN1uIfV2zW
+DB_NAME=neondb
+DB_SSLMODE=require
+
+# Servidor
+PORT=8080
+GIN_MODE=release
+
+# Diretório temporário para arquivos PDF
+# Para produção, use um diretório persistente
+TEMP_DIR=/tmp
+
+# JWT Secret (IMPORTANTE: Use uma chave segura em produção!)
+JWT_SECRET=minha-chave-secreta-super-segura-para-jwt-tokens-producao-2025
+
+# CORS Origins (separados por vírgula)
+# Para produção, use apenas seu domínio
+CORS_ORIGINS=https://relatorios-limpebras.vercel.app,https://seu-dominio.com
